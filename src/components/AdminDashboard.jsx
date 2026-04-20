@@ -1,7 +1,10 @@
-import { Users, LogOut, Trash2 } from 'lucide-react';
+import { useState } from 'react';
+import { Users, LogOut, Trash2, Info, ChevronDown, ChevronUp } from 'lucide-react';
 import { getRQColor, getRQLabel, getDepColor } from '../utils/scoring';
 
 export default function AdminDashboard({ submissions, onLogout, onDelete }) {
+  const [showCriteria, setShowCriteria] = useState(false);
+
   return (
     <div className="max-w-[1400px] mx-auto space-y-6 animate-in fade-in duration-300">
       <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex justify-between items-center flex-wrap gap-4">
@@ -12,10 +15,108 @@ export default function AdminDashboard({ submissions, onLogout, onDelete }) {
             <p className="text-sm text-gray-500">จำนวนทั้งหมด {submissions.length} รายการ</p>
           </div>
         </div>
-        <button onClick={onLogout} className="px-4 py-2 bg-red-50 text-red-600 border border-red-200 rounded-xl font-medium flex items-center gap-2 hover:bg-red-100">
-          <LogOut size={16} /> ออกจากระบบ
-        </button>
+        <div className="flex items-center gap-2">
+          <button onClick={() => setShowCriteria(prev => !prev)} className="px-4 py-2 bg-indigo-50 text-indigo-600 border border-indigo-200 rounded-xl font-medium flex items-center gap-2 hover:bg-indigo-100">
+            <Info size={16} /> เกณฑ์การประเมิน {showCriteria ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+          </button>
+          <button onClick={onLogout} className="px-4 py-2 bg-red-50 text-red-600 border border-red-200 rounded-xl font-medium flex items-center gap-2 hover:bg-red-100">
+            <LogOut size={16} /> ออกจากระบบ
+          </button>
+        </div>
       </div>
+
+      {/* เกณฑ์การประเมิน */}
+      {showCriteria && (
+        <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 space-y-6 animate-in fade-in duration-200">
+          <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2"><Info size={20} className="text-indigo-600" /> เกณฑ์การแปรผลคะแนน</h3>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* RQ */}
+            <div className="space-y-4">
+              <h4 className="font-bold text-blue-700 border-b border-blue-100 pb-2">พลังสุขภาพจิต (RQ) — คะแนนเต็ม 80</h4>
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="text-left text-gray-500">
+                    <th className="pb-2 font-medium">ด้าน</th>
+                    <th className="pb-2 font-medium text-center">ต่ำกว่าปกติ</th>
+                    <th className="pb-2 font-medium text-center">ปกติ</th>
+                    <th className="pb-2 font-medium text-center">สูงกว่าปกติ</th>
+                  </tr>
+                </thead>
+                <tbody className="text-gray-700">
+                  <tr className="border-t border-gray-50">
+                    <td className="py-2">อารมณ์ (40)</td>
+                    <td className="py-2 text-center"><span className="px-2 py-0.5 rounded bg-orange-50 text-orange-600 text-xs font-medium">&lt; 27</span></td>
+                    <td className="py-2 text-center"><span className="px-2 py-0.5 rounded bg-blue-50 text-blue-600 text-xs font-medium">27 – 34</span></td>
+                    <td className="py-2 text-center"><span className="px-2 py-0.5 rounded bg-green-50 text-green-600 text-xs font-medium">&gt; 34</span></td>
+                  </tr>
+                  <tr className="border-t border-gray-50">
+                    <td className="py-2">กำลังใจ (20)</td>
+                    <td className="py-2 text-center"><span className="px-2 py-0.5 rounded bg-orange-50 text-orange-600 text-xs font-medium">&lt; 14</span></td>
+                    <td className="py-2 text-center"><span className="px-2 py-0.5 rounded bg-blue-50 text-blue-600 text-xs font-medium">14 – 19</span></td>
+                    <td className="py-2 text-center"><span className="px-2 py-0.5 rounded bg-green-50 text-green-600 text-xs font-medium">&gt; 19</span></td>
+                  </tr>
+                  <tr className="border-t border-gray-50">
+                    <td className="py-2">การจัดการปัญหา (20)</td>
+                    <td className="py-2 text-center"><span className="px-2 py-0.5 rounded bg-orange-50 text-orange-600 text-xs font-medium">&lt; 13</span></td>
+                    <td className="py-2 text-center"><span className="px-2 py-0.5 rounded bg-blue-50 text-blue-600 text-xs font-medium">13 – 18</span></td>
+                    <td className="py-2 text-center"><span className="px-2 py-0.5 rounded bg-green-50 text-green-600 text-xs font-medium">&gt; 18</span></td>
+                  </tr>
+                  <tr className="border-t border-gray-100 font-bold">
+                    <td className="py-2">คะแนนรวม (80)</td>
+                    <td className="py-2 text-center"><span className="px-2 py-0.5 rounded bg-orange-50 text-orange-600 text-xs font-bold">&lt; 55</span></td>
+                    <td className="py-2 text-center"><span className="px-2 py-0.5 rounded bg-blue-50 text-blue-600 text-xs font-bold">55 – 69</span></td>
+                    <td className="py-2 text-center"><span className="px-2 py-0.5 rounded bg-green-50 text-green-600 text-xs font-bold">&gt; 69</span></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            {/* Depression */}
+            <div className="space-y-4">
+              <h4 className="font-bold text-orange-700 border-b border-orange-100 pb-2">คัดกรองโรคซึมเศร้า (2Q / 9Q)</h4>
+
+              <div className="space-y-3 text-sm text-gray-700">
+                <div>
+                  <p className="font-semibold text-gray-900 mb-1">แบบคัดกรอง 2Q</p>
+                  <p>ถ้าตอบ "มี" อย่างน้อย 1 ข้อ → มีความเสี่ยง → ทำแบบประเมิน 9Q ต่อ</p>
+                  <p>ถ้าตอบ "ไม่มี" ทั้ง 2 ข้อ → ปกติ (ไม่ต้องทำ 9Q)</p>
+                </div>
+
+                <div>
+                  <p className="font-semibold text-gray-900 mb-2">แบบประเมิน 9Q — คะแนนเต็ม 27</p>
+                  <table className="w-full">
+                    <thead>
+                      <tr className="text-left text-gray-500">
+                        <th className="pb-1 font-medium">คะแนน</th>
+                        <th className="pb-1 font-medium">แปรผล</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr className="border-t border-gray-50">
+                        <td className="py-1.5">0 – 6</td>
+                        <td className="py-1.5"><span className="px-2 py-0.5 rounded bg-green-50 text-green-600 text-xs font-medium">ไม่มี หรือน้อยมาก</span></td>
+                      </tr>
+                      <tr className="border-t border-gray-50">
+                        <td className="py-1.5">7 – 12</td>
+                        <td className="py-1.5"><span className="px-2 py-0.5 rounded bg-yellow-50 text-yellow-600 text-xs font-medium">ระดับน้อย</span></td>
+                      </tr>
+                      <tr className="border-t border-gray-50">
+                        <td className="py-1.5">13 – 18</td>
+                        <td className="py-1.5"><span className="px-2 py-0.5 rounded bg-orange-50 text-orange-600 text-xs font-medium">ระดับปานกลาง</span></td>
+                      </tr>
+                      <tr className="border-t border-gray-50">
+                        <td className="py-1.5">19 – 27</td>
+                        <td className="py-1.5"><span className="px-2 py-0.5 rounded bg-red-50 text-red-600 text-xs font-medium">ระดับรุนแรง</span></td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
         <div className="overflow-x-auto">
