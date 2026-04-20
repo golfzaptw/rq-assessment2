@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { signInAnonymously, onAuthStateChanged, signInWithEmailAndPassword, signOut } from 'firebase/auth';
 import { collection, addDoc, onSnapshot, doc, deleteDoc } from 'firebase/firestore';
 import { Brain } from 'lucide-react';
@@ -14,6 +14,7 @@ import Step9Q from './components/Step9Q';
 import ResultView from './components/ResultView';
 
 const COLLECTION_NAME = 'assessment_full_submissions';
+const ADMIN_TIMEOUT_MS = 15 * 60 * 1000; // 15 นาที
 
 export default function App() {
   const [view, setView] = useState('form');
@@ -38,6 +39,9 @@ export default function App() {
   const [adminPassword, setAdminPassword] = useState('');
   const [adminLoginError, setAdminLoginError] = useState('');
   const [isLoggingIn, setIsLoggingIn] = useState(false);
+
+  // Admin inactivity timeout
+  const inactivityTimer = useRef(null);
 
   // Auth listener
   useEffect(() => {
@@ -65,6 +69,41 @@ export default function App() {
     });
     return () => unsubscribe();
   }, [user, view]);
+
+  // Admin inactivity auto-logout (15 นาที)
+  const logoutAdmin = useCallback(async () => {
+    try {
+      await signOut(auth);
+      setAdminEmail('');
+      setAdminPassword('');
+      setView('form');
+    } catch { /* ignore */ }
+  }, []);
+
+  useEffect(() => {
+    const isAdminActive = user && user.email && view === 'admin';
+    if (!isAdminActive) {
+      clearTimeout(inactivityTimer.current);
+      return;
+    }
+
+    const resetTimer = () => {
+      clearTimeout(inactivityTimer.current);
+      inactivityTimer.current = setTimeout(() => {
+        alert('กรุณาเข้าสู่ระบบใหม่');
+        logoutAdmin();
+      }, ADMIN_TIMEOUT_MS);
+    };
+
+    const events = ['mousemove', 'mousedown', 'keydown', 'touchstart', 'scroll'];
+    events.forEach(e => window.addEventListener(e, resetTimer));
+    resetTimer();
+
+    return () => {
+      events.forEach(e => window.removeEventListener(e, resetTimer));
+      clearTimeout(inactivityTimer.current);
+    };
+  }, [user, view, logoutAdmin]);
 
   // === Handlers ===
   const handleSelectRQ = (qId, value) => {
@@ -190,14 +229,7 @@ export default function App() {
     }
   };
 
-  const handleAdminLogout = async () => {
-    try {
-      await signOut(auth);
-      setAdminEmail('');
-      setAdminPassword('');
-      setView('form');
-    } catch { /* ignore */ }
-  };
+  const handleAdminLogout = () => logoutAdmin();
 
   const handleDelete = async (id) => {
     if (window.confirm('คุณแน่ใจหรือไม่ที่จะลบข้อมูลการประเมินนี้? (ลบแล้วกู้คืนไม่ได้)')) {
