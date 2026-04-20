@@ -1,16 +1,48 @@
-# React + Vite
+# ระบบคัดกรองสุขภาพจิตและคัดกรองซึมเศร้า
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+แบบประเมินพลังสุขภาพจิต (RQ) 20 ข้อ พร้อมคัดกรองโรคซึมเศร้า (2Q/9Q) สำหรับใช้งานผ่านเว็บ
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- แบบประเมิน RQ 20 ข้อ (ด้านอารมณ์ / กำลังใจ / การจัดการปัญหา)
+- แบบคัดกรองซึมเศร้า 2Q → 9Q (แสดง 9Q เฉพาะเมื่อมีความเสี่ยง)
+- สรุปผลประเมินพร้อมแปรผลอัตโนมัติ
+- ระบบ Admin สำหรับดูข้อมูลผู้ตอบทั้งหมด
+- บันทึกข้อมูลผ่าน Firebase Firestore
 
-## React Compiler
+## Tech Stack
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- React 19 + Vite
+- Tailwind CSS 4
+- Firebase (Auth + Firestore)
+- GitHub Pages (deploy)
 
-## Expanding the ESLint configuration
+## Getting Started
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+```bash
+npm install
+cp .env.example .env   # แก้ไขค่า Firebase config ใน .env
+npm run dev
+```
+
+## Environment Variables
+
+สร้างไฟล์ `.env` จาก `.env.example` แล้วใส่ค่า Firebase config:
+
+```
+VITE_FIREBASE_API_KEY=...
+VITE_FIREBASE_AUTH_DOMAIN=...
+VITE_FIREBASE_PROJECT_ID=...
+VITE_FIREBASE_STORAGE_BUCKET=...
+VITE_FIREBASE_MESSAGING_SENDER_ID=...
+VITE_FIREBASE_APP_ID=...
+VITE_FIREBASE_MEASUREMENT_ID=...
+```
+
+## Deploy
+
+```bash
+npm run deploy
+```
+
+จะ build แล้ว push ไปที่ GitHub Pages โดยอัตโนมัติ
